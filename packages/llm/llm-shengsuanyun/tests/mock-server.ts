@@ -127,7 +127,7 @@ export function wireModel(overrides: Partial<Omit<WireModel, 'support_apis'>> & 
     name: 'Claude Test',
     max_tokens: 8_192,
     context_window: 200_000,
-    pricing: { prompt: 30_000, completion: 150_000, cache: 3_750 },
+    pricing: { input_price: 30_000, output_price: 150_000, cached_price: 3_750 },
     architecture: { input: 'text', output: 'text', tokenizer: 'cl100k' },
     support_apis: ['/v1/messages'],
   }
