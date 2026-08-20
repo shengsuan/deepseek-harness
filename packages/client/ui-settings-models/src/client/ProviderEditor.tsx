@@ -240,7 +240,6 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     ...probeApi === undefined ? {} : { api: probeApi },
     ...keyValue.length === 0 ? {} : { apiKey: keyValue },
   }
-  console.log(JSON.stringify(draft,null,2),']]]]]]]]]]]]]]]]]]]')
   /**
    * The write for this card, or a failure message. Every edit travels as
    * path ops against the STORED section: the draft comes from the redacted

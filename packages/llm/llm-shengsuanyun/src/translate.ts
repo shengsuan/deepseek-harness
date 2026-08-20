@@ -12,7 +12,7 @@
 
 import Anthropic from '@anthropic-ai/sdk'
 import { CallId, contentHasImage, EMPTY_RESPONSE_CODE, LlmError } from '@deepseek-ai/dsh-llm'
-import type { ContentBlock, FinishReason, GenerateOptions, Message, StreamChunk, TokenUsage, ToolSchema } from '@deepseek-ai/dsh-llm'
+import type { ContentBlock, FinishReason, GenerateOptions, Message, ReplayEnvelope, StreamChunk, TokenUsage, ToolSchema } from '@deepseek-ai/dsh-llm'
 import { getReasoningOptions } from './catalog.ts'
 
 type MessageParam = Anthropic.MessageParam
@@ -98,10 +98,15 @@ function serializeAssistantLossy(message: Message): ContentBlockParam[] {
   return blocks
 }
 
+function isReplayEnvelope(value: unknown): value is ReplayEnvelope {
+  return typeof value === 'object' && value !== null && 'response' in value
+}
+
 function serializeAssistant(message: Message): MessageParam {
   const replayState = message.source.kind === 'model' ? message.source.replayState : undefined
-  const content = Array.isArray(replayState)
-    ? replayState as ContentBlockParam[]
+  const blocks = isReplayEnvelope(replayState) ? replayState.blocks : undefined
+  const content = Array.isArray(blocks)
+    ? blocks as ContentBlockParam[]
     : serializeAssistantLossy(message)
   return { role: 'assistant', content }
 }
@@ -353,7 +358,10 @@ export async function* translate(events: AsyncIterable<RawMessageStreamEvent>): 
         const reason = pendingReason === undefined
           ? { kind: 'stop' as const }
           : mapStopReason(pendingReason, pendingRefusal)
-        const replayState = order.map(closeReplayBlock).filter((value): value is AnthropicContentBlock => value !== undefined)
+        const replayState: ReplayEnvelope = {
+          response: null,
+          blocks: order.map(closeReplayBlock).filter((value): value is AnthropicContentBlock => value !== undefined),
+        }
         yield {
           type: 'finish',
           reason: reason.kind === 'stop' && order.length === 0

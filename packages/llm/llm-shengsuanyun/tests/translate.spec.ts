@@ -127,23 +127,23 @@ describe('serializeMessages', () => {
   })
 
   it('replays the stored native content blocks verbatim when replayState is present', () => {
-    const replayState = [{ type: 'thinking', thinking: 'mull', signature: 'sig' }, { type: 'text', text: 'answer', citations: null }]
+    const blocks = [{ type: 'thinking', thinking: 'mull', signature: 'sig' }, { type: 'text', text: 'answer', citations: null }]
     const wire = serializeMessages([
       createMessage({
         role: 'assistant',
         content: [{ type: 'text', text: 'answer' }],
-        source: { kind: 'model', provider: 'shengsuanyun', model: 'm', replayState },
+        source: { kind: 'model', provider: 'shengsuanyun', model: 'm', replayState: { response: null, blocks } },
       }),
     ])
-    expect(wire).toEqual([{ role: 'assistant', content: replayState }])
+    expect(wire).toEqual([{ role: 'assistant', content: blocks }])
   })
 
-  it('falls back to the lossy path when replayState is not an array', () => {
+  it('falls back to the lossy path when replayState has no blocks array', () => {
     const wire = serializeMessages([
       createMessage({
         role: 'assistant',
         content: [{ type: 'text', text: 'answer' }],
-        source: { kind: 'model', provider: 'shengsuanyun', model: 'm', replayState: { not: 'an array' } },
+        source: { kind: 'model', provider: 'shengsuanyun', model: 'm', replayState: { response: null } },
       }),
     ])
     expect(wire).toEqual([{ role: 'assistant', content: [{ type: 'text', text: 'answer' }] }])
@@ -356,7 +356,7 @@ describe('translate: text', () => {
       {
         type: 'finish',
         reason: { kind: 'stop' },
-        replayState: [{ type: 'text', text: 'hello', citations: null }],
+        replayState: { response: null, blocks: [{ type: 'text', text: 'hello', citations: null }] },
       },
     ])
   })
@@ -383,7 +383,7 @@ describe('translate: reasoning', () => {
     const finish = chunks.at(-1)
     expect(finish?.type).toBe('finish')
     if (finish?.type !== 'finish') throw new Error('expected finish')
-    expect(finish.replayState).toEqual([{ type: 'thinking', thinking: 'mulling', signature: 'sig-1' }])
+    expect(finish.replayState).toEqual({ response: null, blocks: [{ type: 'thinking', thinking: 'mulling', signature: 'sig-1' }] })
   })
 })
 
@@ -408,7 +408,7 @@ describe('translate: tool calls', () => {
       {
         type: 'finish',
         reason: { kind: 'tool-calls' },
-        replayState: [{ type: 'tool_use', id: 'call_1', name: 'get_weather', input: { city: 'Paris' }, caller: { type: 'direct' } }],
+        replayState: { response: null, blocks: [{ type: 'tool_use', id: 'call_1', name: 'get_weather', input: { city: 'Paris' }, caller: { type: 'direct' } }] },
       },
     ])
   })
@@ -423,7 +423,7 @@ describe('translate: tool calls', () => {
     )))
     const finish = chunks.at(-1)
     if (finish?.type !== 'finish') throw new Error('expected finish')
-    expect(finish.replayState).toEqual([{ type: 'tool_use', id: 'call_1', name: 'noop', input: {}, caller: { type: 'direct' } }])
+    expect(finish.replayState).toEqual({ response: null, blocks: [{ type: 'tool_use', id: 'call_1', name: 'noop', input: {}, caller: { type: 'direct' } }] })
   })
 })
 
@@ -457,7 +457,7 @@ describe('translate: finish and usage handling', () => {
       {
         type: 'finish',
         reason: { kind: 'error', failure: { message: 'model returned a completed response with no content', code: EMPTY_RESPONSE_CODE } },
-        replayState: [],
+        replayState: { response: null, blocks: [] },
       },
     ])
   })
@@ -515,7 +515,7 @@ describe('translate: finish and usage handling', () => {
       {
         type: 'finish',
         reason: { kind: 'error', failure: { message: 'model returned a completed response with no content', code: EMPTY_RESPONSE_CODE } },
-        replayState: [],
+        replayState: { response: null, blocks: [] },
       },
     ])
   })

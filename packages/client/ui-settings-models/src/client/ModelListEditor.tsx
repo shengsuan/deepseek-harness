@@ -228,7 +228,6 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
   }
 
   const fetchModels = async (): Promise<void> => {
-    console.log(JSON.stringify(probe,null,2),'----------------')
     setBusy(true)
     setFailure(undefined)
     try {
