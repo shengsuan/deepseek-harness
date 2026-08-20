@@ -1075,6 +1075,9 @@ importers:
       '@deepseek-ai/dsh-llm-retry':
         specifier: workspace:^
         version: link:../../llm/llm-retry
+      '@deepseek-ai/dsh-llm-shengsuanyun':
+        specifier: workspace:^
+        version: link:../../llm/llm-shengsuanyun
       '@deepseek-ai/dsh-permission-presets':
         specifier: workspace:^
         version: link:../../interaction/permission-presets

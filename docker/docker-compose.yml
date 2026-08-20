@@ -1,0 +1,34 @@
+services:
+  dsh:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        # Override with the checked-out commit, e.g.:
+        #   DSH_CLIENT_COMMIT_HASH=$(git rev-parse HEAD) docker compose build
+        DSH_CLIENT_COMMIT_HASH: ${DSH_CLIENT_COMMIT_HASH:-0000000}
+    image: dsh:local
+    # dsh web refuses --host 0.0.0.0 (packages/bundle/web-app/src/startup.ts),
+    # so published ports cannot reach it; host networking is the supported
+    # path to browse the UI from outside the container. Remove this and add
+    # a `ports:` mapping only if you front the container with a reverse
+    # proxy that itself binds 127.0.0.1:3080 inside the container network
+    # namespace (e.g. another container sharing this one's network stack).
+    network_mode: host
+    environment:
+      # List/pass-through form throughout: an entry with no `=value` is omitted
+      # entirely from the container when unset on the host, instead of the
+      # mapping form's `${VAR:-}`, which would set SHENGSUANYUN_BASE_URL to an
+      # empty string. The llm-shengsuanyun plugin only falls back to its public
+      # router when the variable is absent, not when it is empty, so an empty
+      # string reaches the Anthropic SDK unchanged and the SDK's own fallback
+      # silently swaps it for the real api.anthropic.com.
+      - SHENGSUANYUN_API_KEY=${SHENGSUANYUN_API_KEY:?set SHENGSUANYUN_API_KEY in the environment or a .env file}
+      - SHENGSUANYUN_BASE_URL
+    volumes:
+      # Persists profiles, credentials, and session/storage data across
+      # container recreation ($DSH_HOME defaults to /home/node/.dsh in-image).
+      - dsh-home:/home/node/.dsh
+
+volumes:
+  dsh-home:

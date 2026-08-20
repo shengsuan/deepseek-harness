@@ -15,11 +15,12 @@ export interface WireModel {
   context_window: number
   supports_prompt_cache?: boolean
   pricing: {
-    prompt?: number
-    completion?: number
-    cache?: number
-    image?: number
-    request?: number
+    price?: number
+    input_price?: number
+    output_price?: number
+    cached_price?: number
+    image_price?: number
+    currency?: string
   }
   architecture: {
     input: string

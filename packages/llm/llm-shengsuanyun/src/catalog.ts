@@ -82,13 +82,13 @@ function mapEntry(model: WireModel): CatalogEntry | undefined {
   return {
     id: model.id,
     name: model.name || model.id,
-    contextWindow: model.context_window || 4096,
+    contextWindow: model.context_window || 128000,
     maxTokens: model.max_tokens || 4096,
     cost: {
-      input:model.pricing.prompt ||0,
-      output: model.pricing.completion ||0,
+      input:model.pricing.input_price ||0,
+      output: model.pricing.output_price ||0,
       cacheRead: 0,
-      cacheWrite: model.pricing.cache ||0,
+      cacheWrite: model.pricing.cached_price ||0,
     },
     reasoning: reasoningOptions?.some(option => option.type === 'toggle' || option.type === 'effort') ?? false,
     ...reasoningOptions === undefined ? {} : { reasoningOptions },
