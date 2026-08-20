@@ -1162,6 +1162,40 @@ export type Config = Readonly<Record<string, never>>
 
 Source: [`packages/llm/llm-retry/src/index.ts:24`](../packages/llm/llm-retry/src/index.ts)
 
+<a id="deepseek-aidsh-llm-shengsuanyun"></a>
+
+## `@deepseek-ai/dsh-llm-shengsuanyun`
+
+Requires: `llm`
+
+```ts config-catalog
+/**
+ * Plugin config, validated by the same-named schemastery schema and doubling
+ * as the `llm-shengsuanyun` settings-section shape. Every field is optional
+ * in yml: a missing API key resolves through {@link Config.apiKeyEnv} at each
+ * request (a request without any key fails with `MISSING_CREDENTIAL`, not at
+ * plugin load).
+ */
+export interface Config {
+  /** Credential reference (environment-variable name) resolved per request; defaults to `SHENGSUANYUN_API_KEY`. */
+  apiKeyEnv?: string
+  /** Anthropic Messages endpoint base; falls back to $SHENGSUANYUN_BASE_URL from a trusted environment layer, then the public router. */
+  baseURL?: string
+  /** Model-listing endpoint; defaults to the public router's `/v1/models`. */
+  modelsURL?: string
+  /** Default per-request output cap, used only when a model advertises none (default 8,192). */
+  maxTokens?: number
+  /** Maximum provider idle time while one stream read is outstanding (default five minutes). */
+  streamIdleTimeoutMs?: number
+  /** Provider-owned model-request retry policy; omission uses normal defaults. */
+  retryPolicy?: RetryPolicyConfig
+}
+```
+
+Depends on: [`RetryPolicyConfig`](../packages/llm/llm/src/index.ts)
+
+Source: [`packages/llm/llm-shengsuanyun/src/index.ts:64`](../packages/llm/llm-shengsuanyun/src/index.ts)
+
 <a id="deepseek-aidsh-lsp-stdio"></a>
 
 ## `@deepseek-ai/dsh-lsp-stdio`

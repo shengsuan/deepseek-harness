@@ -38,7 +38,7 @@ import type { en } from './locales.ts'
 import styles from './ModelsSection.module.css'
 
 /** Per-adapter-family curated field sets (unknown namespaces get the hint alone). */
-type EditorLayout = 'deepseek' | 'pi-ai' | 'unknown'
+type EditorLayout = 'shengsuanyun' | 'deepseek' | 'pi-ai' | 'unknown'
 
 /** The public DeepSeek endpoint shown as the deepseek base-URL placeholder. */
 const DEEPSEEK_PUBLIC_BASE_URL = 'https://api.deepseek.com'
@@ -125,6 +125,7 @@ export function pathOps(
 function layoutOf(ns: string): EditorLayout {
   if (ns === 'llm-deepseek') return 'deepseek'
   if (ns === 'llm-pi-ai') return 'pi-ai'
+  if (ns === 'llm-shengsuanyun') return 'shengsuanyun'
   return 'unknown'
 }
 
@@ -228,6 +229,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
     ...probeApi === undefined ? {} : { api: probeApi },
     ...keyValue.length === 0 ? {} : { apiKey: keyValue },
   }
+  console.log(JSON.stringify(draft,null,2),']]]]]]]]]]]]]]]]]]]')
   /**
    * The write for this card, or a failure message. Every edit travels as
    * path ops against the STORED section: the draft comes from the redacted
@@ -331,7 +333,7 @@ export function ProviderEditor(props: ProviderEditorProps): ReactNode {
    * narrowed so the per-family branches below are total: an unknown namespace
    * renders the hint instead and never reaches this body.
    */
-  const curatedFields = (family: 'deepseek' | 'pi-ai'): ReactNode => {
+  const curatedFields = (family: 'deepseek' | 'pi-ai' | 'shengsuanyun'): ReactNode => {
     // What a hand-declared route names for itself and nothing else can supply.
     // A whole-section `llm-deepseek` profile is a composition fact with no
     // per-route identity for its schema to carry, hence the family test.
